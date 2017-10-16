@@ -32,7 +32,7 @@ public:
 
 	// Try to move the player horizontally
 	UFUNCTION(BlueprintCallable)
-	bool MoveHorizontally(float amount);
+	float MoveHorizontally(float amount);
 
 private:
 	bool CanDisplaceHorizontally();

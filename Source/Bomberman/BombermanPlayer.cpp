@@ -32,17 +32,25 @@ void ABombermanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
-bool ABombermanPlayer::MoveHorizontally(float amount)
+// Filter to restrict the horizontal movement of the player on the Dyna Blaster board
+// Removing the need of physics calculations in a very simple grid-based game type
+float ABombermanPlayer::MoveHorizontally(float amount)
 {
-	if (!CanDisplaceHorizontally()) { return false; }
+	// If the displacement is not possible, just return 0 as the movement value
+	if (!CanDisplaceHorizontally()) { return 0.0f; }
 
-	return true;
+	// Otherwise allow the full movement
+	return amount;
 }
 
+// A method for check the specific Dyna Blaster conditions, regarding walls position to see if the player can move horizontally
 bool ABombermanPlayer::CanDisplaceHorizontally()
 {
+	// Sanity check, if the game settings are not available, then there is nothing to do
+	if (gameSettings == nullptr) { return false; }
+
 	// Unreal units are in cms
-	FVector playerPositionMt = GetActorLocation() / gameSettings->UNREAL_UNIT_TO_MT;
+	FVector playerPositionMt = GetActorLocation() * gameSettings->UNREAL_UNIT_TO_MT;
 
 	int nearestRow = FGenericPlatformMath::RoundToInt(playerPositionMt.X);
 
