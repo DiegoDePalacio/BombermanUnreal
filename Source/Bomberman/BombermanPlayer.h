@@ -34,8 +34,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float MoveHorizontally(float amount);
 
+	// Try to move the player vertically
+	UFUNCTION(BlueprintCallable)
+	float MoveVertically(float amount);
+
 private:
-	bool CanDisplaceHorizontally();
+	bool CanDisplace( bool horizontally );
 	
 
 };

@@ -37,14 +37,25 @@ void ABombermanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 float ABombermanPlayer::MoveHorizontally(float amount)
 {
 	// If the displacement is not possible, just return 0 as the movement value
-	if (!CanDisplaceHorizontally()) { return 0.0f; }
+	if (!CanDisplace(true)) { return 0.0f; }
+
+	// Otherwise allow the full movement
+	return amount;
+}
+
+// Filter to restrict the horizontal movement of the player on the Dyna Blaster board
+// Removing the need of physics calculations in a very simple grid-based game type
+float ABombermanPlayer::MoveVertically(float amount)
+{
+	// If the displacement is not possible, just return 0 as the movement value
+	if (!CanDisplace(false)) { return 0.0f; }
 
 	// Otherwise allow the full movement
 	return amount;
 }
 
 // A method for check the specific Dyna Blaster conditions, regarding walls position to see if the player can move horizontally
-bool ABombermanPlayer::CanDisplaceHorizontally()
+bool ABombermanPlayer::CanDisplace( bool horizontally )
 {
 	// Sanity check, if the game settings are not available, then there is nothing to do
 	if (gameSettings == nullptr) { return false; }
@@ -52,19 +63,21 @@ bool ABombermanPlayer::CanDisplaceHorizontally()
 	// Unreal units are in cms
 	FVector playerPositionMt = GetActorLocation() * gameSettings->UNREAL_UNIT_TO_MT;
 
-	int nearestRow = FGenericPlatformMath::RoundToInt(playerPositionMt.X);
+	float positionBetweenCorridors = (horizontally ? playerPositionMt.X : playerPositionMt.Y);
+	int nearestCorridor = FGenericPlatformMath::RoundToInt(positionBetweenCorridors);
 
 	// If the player is between horizontal walls, so the horizontal displacement is not possible
 	// The game Dyna Blaster only allows movement in one of every two rows, in an altered way
-	if (nearestRow % 2 != 0) { return false; }
+	if (nearestCorridor % 2 != 0) { return false; }
 
-	float distanceToNearestRow = FGenericPlatformMath::Abs(playerPositionMt.X - nearestRow);
+	float distanceToNearestCorridor = FGenericPlatformMath::Abs(positionBetweenCorridors - nearestCorridor);
 
 	// If the player doesn't fit between walls, then the diplacement is not possible
-	if (distanceToNearestRow > (1 - gameSettings->PLAYER_COLLISION_DIAMETER_MT))
+	if (distanceToNearestCorridor > (1 - gameSettings->PLAYER_COLLISION_DIAMETER_MT))
 	{
 		return false;
 	}
 
 	return true;
 }
+
