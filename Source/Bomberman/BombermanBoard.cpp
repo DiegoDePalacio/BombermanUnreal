@@ -32,6 +32,10 @@ void ABombermanBoard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	for (auto timer : timers)
+	{
+		timer->Update(DeltaTime);
+	}
 }
 
 void ABombermanBoard::GenerateBoard()
@@ -168,5 +172,10 @@ ABombermanDestructibleWall* ABombermanBoard::GetTile(int col, int row)
 
 		return tiles[col]->destructibleWalls[rowIndex];
 	}
+}
+
+void ABombermanBoard::RegisterTimer(TriggerModifierOnProcessTimer* timer)
+{
+	timers.Add(timer);
 }
 

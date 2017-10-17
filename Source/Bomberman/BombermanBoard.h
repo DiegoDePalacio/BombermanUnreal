@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "BombermanDestructibleWall.h"
+#include "TriggerModifierOnProcessTimer.h"
 #include "BombermanBoard.generated.h"
 
 USTRUCT()
@@ -60,6 +61,7 @@ public:
 
 private:
 	TArray<FBoardCol*> tiles;
+	TArray<TriggerModifierOnProcessTimer*> timers;
 
 private:
 	void GenerateBoard();
@@ -68,4 +70,6 @@ private:
 public:
 	bool IsWalkableTile(int col, int row);
 	ABombermanDestructibleWall* GetTile(int col, int row);
+
+	void RegisterTimer(TriggerModifierOnProcessTimer* timer);
 };
