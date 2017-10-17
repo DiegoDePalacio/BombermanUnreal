@@ -12,9 +12,6 @@
 class BOMBERMAN_API RemoteBombModifier : public Modifier
 {
 protected:
-	// A reference to the board
-	ABombermanBoard* bombermanBoard = nullptr;
-
 	// The owner of the bomb
 	ABombermanPlayer* player = nullptr;
 

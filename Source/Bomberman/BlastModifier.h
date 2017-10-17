@@ -14,10 +14,6 @@ class BOMBERMAN_API BlastModifier : public Modifier
 public:
 	TriggerModifierOnProcessTimer* timer;
 
-private:	
-	// A reference to the board
-	ABombermanBoard* bombermanBoard = nullptr;
-
 public:
 	BlastModifier(ABombermanBoard* newBombermanBoard, int newCol, int newRow);
 	virtual ~BlastModifier();
