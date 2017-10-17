@@ -73,6 +73,8 @@ public:
 	// and then the game is a tie
 	void DieOnNextFrame();
 
+	void AddToSpeed(float amount);
+
 private:
 	// Is possible to move horizontally / vertically?
 	bool CanMove(bool horizontally);

@@ -18,5 +18,9 @@ public:
 	// So the diameter of the collision box of the player needs to be less than one meter
 	const float PLAYER_COLLISION_DIAMETER_MT = 0.8f;
 	
-	
+	// TODO: Expose this parameters to be configurable on the Editor
+
+	// Maximum / minimum amount of the player speed 
+	const float MIN_SPEED = 1.0f;
+	const float MAX_SPEED = 5.0f;
 };

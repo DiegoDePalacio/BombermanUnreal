@@ -161,6 +161,18 @@ void ABombermanPlayer::DieOnNextFrame()
 {
 }
 
+void ABombermanPlayer::AddToSpeed(float amount)
+{
+	if (gameSettings != nullptr)
+	{
+		speed = FMath::Clamp(speed + amount, gameSettings->MIN_SPEED, gameSettings->MAX_SPEED);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("The modifier speed can't be assigned because the game settings are not available!"));
+	}
+}
+
 bool ABombermanPlayer::CanMove(bool horizontally)
 {
 	// Sanity check, if the game settings are not available, then there is nothing to do
