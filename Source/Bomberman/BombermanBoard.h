@@ -61,7 +61,11 @@ public:
 private:
 	TArray<FBoardCol*> tiles;
 
-public:
+private:
 	void GenerateBoard();
+	bool IsUndestructibleWall(int col, int row);
 
+public:
+	bool IsWalkableTile(int col, int row);
+	ABombermanDestructibleWall* GetTile(int col, int row);
 };

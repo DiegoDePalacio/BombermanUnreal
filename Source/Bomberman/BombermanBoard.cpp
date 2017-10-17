@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BombermanBoard.h"
+#include "BombermanPlayer.h"
+#include "EngineUtils.h"
 #include "Engine/World.h"
 
 
@@ -17,6 +19,12 @@ void ABombermanBoard::BeginPlay()
 {
 	Super::BeginPlay();
 	GenerateBoard();
+
+	for (TActorIterator<ABombermanPlayer> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		ABombermanPlayer* player = *ActorItr;
+		player->SetBoard(this);
+	}
 }
 
 // Called every frame
@@ -43,7 +51,7 @@ void ABombermanBoard::GenerateBoard()
 	{
 		int newColRows = (col % 2 == 0 ? rows : rowsInOddColumns);
 		
-		tiles.Emplace(new FBoardCol());
+		tiles.Add(new FBoardCol());
 
 		for (int row = 0; row < newColRows; ++row)
 		{
@@ -55,10 +63,18 @@ void ABombermanBoard::GenerateBoard()
 
 			// Don't create destructible tiles on the first player tile 
 			// Or in the next at his adjacent tiles, because can cause a certain suicide situation for him
-			if (col < 2 && realRow < 2) { continue; }
+			if (col < 2 && realRow < 2) 
+			{ 
+				tiles[col]->destructibleWalls.Emplace(nullptr);
+				continue; 
+			}
 
 			// Do the same for the second player
-			if (col > (cols - 3) && realRow > (rows - 3)) { continue; }
+			if (col > (cols - 3) && realRow > (rows - 3)) 
+			{
+				tiles[col]->destructibleWalls.Emplace(nullptr);
+				continue; 
+			}
 
 			if (FGenericPlatformMath::FRand() < normalizedProbabilityOfDestructibleWall)
 			{
@@ -79,7 +95,7 @@ void ABombermanBoard::GenerateBoard()
 						{
 							ABombermanDestructibleWall* newPowerUpWall = GetWorld()
 								->SpawnActor<ABombermanDestructibleWall>(destructibleWallsWithPowerUpBP[powerUpIndex], wallPosition, FRotator(0, 0, 0));
-							tiles[col]->destructibleWalls.Emplace(newPowerUpWall);
+							tiles[col]->destructibleWalls.Add(newPowerUpWall);
 						}
 						else
 						{
@@ -97,7 +113,7 @@ void ABombermanBoard::GenerateBoard()
 					{
 						ABombermanDestructibleWall* newEmptyWall = GetWorld()
 							->SpawnActor<ABombermanDestructibleWall>(emptyDestructibleWallBP, wallPosition, FRotator(0, 0, 0));
-						tiles[col]->destructibleWalls.Emplace(newEmptyWall);
+						tiles[col]->destructibleWalls.Add(newEmptyWall);
 					}
 					else
 					{
@@ -110,6 +126,47 @@ void ABombermanBoard::GenerateBoard()
 				tiles[col]->destructibleWalls.Emplace(nullptr);
 			}
 		}
+	}
+}
+
+bool ABombermanBoard::IsWalkableTile(int col, int row)
+{
+	return (GetTile(col, row) == nullptr);
+}
+
+bool ABombermanBoard::IsUndestructibleWall(int col, int row)
+{
+	return (col % 2 != 0 && row % 2 != 0);
+}
+
+ABombermanDestructibleWall* ABombermanBoard::GetTile(int col, int row)
+{
+	// Check first if it's outside of the board
+	if (col < 0) { return nullptr; }
+	if (col >= cols) { return nullptr; }
+	if (row < 0) { return nullptr; }
+	if (row >= rows) { return nullptr; }
+
+	// Check if is in a tile with a indestructible wall
+	if (IsUndestructibleWall(col, row)) { return nullptr; }
+
+	if (tiles.Num() <= col) { return nullptr; }
+
+	// If is an even column, check directly on the row number of the FBoardCol instance
+	if (col % 2 == 0)
+	{
+		if (tiles[col]->destructibleWalls.Num() <= row) { return nullptr; }
+
+		return tiles[col]->destructibleWalls[row];
+	}
+	else
+	{
+		// If not, first calculate the respective index
+		int rowIndex = FGenericPlatformMath::RoundToInt(row / 2.0f);
+
+		if (tiles[col]->destructibleWalls.Num() <= rowIndex) { return nullptr; }
+
+		return tiles[col]->destructibleWalls[rowIndex];
 	}
 }
 

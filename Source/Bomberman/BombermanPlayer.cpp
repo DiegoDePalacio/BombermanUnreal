@@ -22,39 +22,16 @@ void ABombermanPlayer::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("Game settings not found!"));
 	}
 
-	if( board != NULL )
-	{
-		float playerDiameter = 0.0f;
-		float playerRadius = 0.0f;
-
-		if (gameSettings != nullptr)
-		{
-			// Unreal unit by default is centimeter
-			playerDiameter = gameSettings->PLAYER_COLLISION_DIAMETER_MT * 100.0f;
-			playerRadius = playerDiameter * 0.5f;
-		}
-
-		// For simplicity reasons, the tile size is 1 square meters
-		// The center of the first column and row is the origin
-		minPlayerBoardX = -0.5f + playerRadius;
-		minPlayerBoardY = -0.5f + playerRadius;
-
-		// For simplicity reasons, the tile size is 1 square meters
-		// Unreal unit by default is centimeter
-		float boardHeight = board->GetDefaultObject<ABombermanBoard>()->rows * 100.0f;
-		float boardWidth = board->GetDefaultObject<ABombermanBoard>()->cols * 100.0f;
-
-		maxPlayerBoardX = minPlayerBoardX + boardHeight - playerDiameter;
-		maxPlayerBoardY = minPlayerBoardY + boardWidth - playerDiameter;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Game board not found!"));
-	}
-
 	// TODO: Instantiate the players here, instead of placing them manually on the Unreal editor
 	// in order to assure that they will appear on the "safety" zones of the board (currently the 
 	// bottom-left and top-right corners) 
+
+	FVector playerPosition = GetActorLocation();
+
+	// For simplicity reasons, the tile size is 1 square unit
+	// Unreal unit by default is centimeter
+	col = FGenericPlatformMath::RoundToInt(playerPosition.Y * 0.01f);
+	row = FGenericPlatformMath::RoundToInt(playerPosition.X * 0.01f);
 }
 
 // Called every frame
@@ -75,11 +52,33 @@ void ABombermanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 // Removing the need of physics calculations in a very simple grid-based game type
 float ABombermanPlayer::MoveHorizontally(float amount)
 {
+	// If no movement there is nothing to do
+	if( amount == 0.0f ) { return 0.0f; }
+
 	// Check first the board boundaries
 	if (!WillStayInsideTheBoard(true,amount)) { return 0.0f; }
 
 	// If the displacement is not possible, just return 0 as the movement value
-	if (!CanDisplace(true)) { return 0.0f; }
+	if (!CanMove(true)) { return 0.0f; }
+
+	FVector playerPosition = GetActorLocation();
+
+	// The radius of the player in the direction of the desired movement
+	float playerOffset = (amount < 0.0f ? -playerDiameter : playerDiameter) * 0.5f;
+
+	// For simplicity reasons, the tile size is 1 square unit
+	// Unreal unit by default is centimeter
+	int newCol = FGenericPlatformMath::RoundToInt((playerPosition.Y + amount + playerOffset) * 0.01f);
+
+	if (newCol != col)
+	{
+		// Check if the tile is currently "walkable"
+		if (bombermanBoard == nullptr ) { return 0.0f; }
+		if (!bombermanBoard->IsWalkableTile(newCol, row)) { return 0.0f; }
+
+		// Only change the col if the center of the player is inside of the new col
+		col = FGenericPlatformMath::RoundToInt((playerPosition.Y + amount) * 0.01f);
+	}
 
 	// Otherwise allow the full movement
 	return amount;
@@ -89,39 +88,89 @@ float ABombermanPlayer::MoveHorizontally(float amount)
 // Removing the need of physics calculations in a very simple grid-based game type
 float ABombermanPlayer::MoveVertically(float amount)
 {
+	// If no movement there is nothing to do
+	if (amount == 0.0f) { return 0.0f; }
+
 	// Check first the board boundaries
 	if (!WillStayInsideTheBoard(false, amount)) { return 0.0f; }
 
 	// If the displacement is not possible, just return 0 as the movement value
-	if (!CanDisplace(false)) { return 0.0f; }
+	if (!CanMove(false)) { return 0.0f; }
+
+	FVector playerPosition = GetActorLocation();
+
+	// The radius of the player in the direction of the desired movement
+	float playerOffset = (amount < 0.0f ? -playerDiameter : playerDiameter) * 0.5f;
+
+	// For simplicity reasons, the tile size is 1 square unit
+	// Unreal unit by default is centimeter
+	int newRow = FGenericPlatformMath::RoundToInt((playerPosition.X + amount + playerOffset) * 0.01f);
+
+	if (newRow != row)
+	{
+		// Check if the tile is currently "walkable"
+		if (bombermanBoard == nullptr) { return 0.0f; }
+		if (!bombermanBoard->IsWalkableTile(col, newRow)) { return 0.0f; }
+
+		// Only change the row if the center of the player is inside of the new row
+		row = FGenericPlatformMath::RoundToInt((playerPosition.X + amount) * 0.01f);
+	}
 
 	// Otherwise allow the full movement
 	return amount;
 }
 
-// A method for check the specific Dyna Blaster conditions, regarding walls position to see if the player can move horizontally
-bool ABombermanPlayer::CanDisplace( bool horizontally )
+void ABombermanPlayer::SetBoard(ABombermanBoard * board)
+{
+	bombermanBoard = board;
+
+	if (gameSettings != nullptr)
+	{
+		// Unreal unit by default is centimeter
+		playerDiameter = gameSettings->PLAYER_COLLISION_DIAMETER_MT * 100.0f;
+	}
+
+	// The half of the amount of space between the player and the tile size
+	float halfOfPlayerOffset = 0.5f * (100.0f - playerDiameter);
+
+	// For simplicity reasons, the tile size is 1 square meters
+	// The center of the first column and row is the origin
+	minPlayerBoardX = -halfOfPlayerOffset;
+	minPlayerBoardY = minPlayerBoardX;
+
+	// For simplicity reasons, the tile size is 1 square meters
+	// Unreal unit by default is centimeter
+	float boardHeight = bombermanBoard->rows * 100.0f;
+	float boardWidth = bombermanBoard->cols * 100.0f;
+
+	maxPlayerBoardX = minPlayerBoardX + boardHeight - playerDiameter;
+	maxPlayerBoardY = minPlayerBoardY + boardWidth - playerDiameter;
+}
+
+bool ABombermanPlayer::CanMove(bool horizontally)
 {
 	// Sanity check, if the game settings are not available, then there is nothing to do
 	if (gameSettings == nullptr) { return false; }
 
 	// Unreal units are in cms
-	FVector playerPositionMt = GetActorLocation() * gameSettings->UNREAL_UNIT_TO_MT;
+	FVector playerPositionMt = GetActorLocation() * 0.01f;
 
 	float positionBetweenCorridors = (horizontally ? playerPositionMt.X : playerPositionMt.Y);
 
 	// For simplicity reasons, the corridor width is 1 square meters
 	int nearestCorridor = FGenericPlatformMath::RoundToInt(positionBetweenCorridors);
 
-	// If the player is between horizontal walls, so the horizontal displacement is not possible
+	float distanceToNearestCorridor = FGenericPlatformMath::Abs(positionBetweenCorridors - nearestCorridor);
+
+	// TODO: Allow small movements, even if a wall is in front, because the diameter of the player is less
+	// than the size of a board tile
+
+	// If the player have a wall in front, the displacement is not possible
 	// The game Dyna Blaster only allows movement in one of every two rows, in an altered way
 	if (nearestCorridor % 2 != 0) { return false; }
 
-	float distanceToNearestCorridor = FGenericPlatformMath::Abs(positionBetweenCorridors - nearestCorridor);
-
-
 	// If the player doesn't fit between walls, then the diplacement is not possible
-	if (distanceToNearestCorridor > (1 - gameSettings->PLAYER_COLLISION_DIAMETER_MT))
+	if (distanceToNearestCorridor > (1.0f - gameSettings->PLAYER_COLLISION_DIAMETER_MT))
 	{
 		return false;
 	}
@@ -132,7 +181,7 @@ bool ABombermanPlayer::CanDisplace( bool horizontally )
 // The desired movement will place the player inside of the board?
 bool ABombermanPlayer::WillStayInsideTheBoard(bool horizontally, float movementAmount)
 {
-	if (board == nullptr) { return false; }
+	if (bombermanBoard == nullptr) { return false; }
 
 	FVector playerPosition = GetActorLocation();
 

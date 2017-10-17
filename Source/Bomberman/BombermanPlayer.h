@@ -29,10 +29,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 #pragma endregion [APawn]
 
-public:
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	TSubclassOf<class ABombermanBoard> board = nullptr;
-
 private:
 	ABombermanGameModeBase* gameSettings = nullptr;
 
@@ -41,6 +37,13 @@ private:
 	float maxPlayerBoardX = std::numeric_limits<float>::min();
 	float minPlayerBoardY = std::numeric_limits<float>::max();
 	float maxPlayerBoardY = std::numeric_limits<float>::min();
+
+	int col = -1;
+	int row = -1;
+
+	// Cached variables
+	ABombermanBoard* bombermanBoard = nullptr;
+	float playerDiameter = 0.0f;
 
 public:
 	// Called to bind functionality to input
@@ -54,9 +57,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float MoveVertically(float amount);
 
+	void SetBoard(ABombermanBoard* board);
+
 private:
 	// Is possible to move horizontally / vertically?
-	bool CanDisplace( bool horizontally );
+	bool CanMove(bool horizontally);
 	
 	// The desired movement will place the player inside of the board?
 	bool WillStayInsideTheBoard(bool horizontally, float movementAmount);
