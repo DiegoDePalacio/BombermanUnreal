@@ -14,7 +14,7 @@ class Modifier;
  */
 class BOMBERMAN_API TriggerModifierOnProcessTimer
 {
-public:
+private:
 	Modifier* modifier = nullptr;
 
 	// How much time will have to pass in order to trigger the modifier::OnProcess method?

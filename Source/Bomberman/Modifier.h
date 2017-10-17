@@ -34,6 +34,10 @@ enum class EModifierType : uint8
 class BOMBERMAN_API Modifier
 {
 public:
+	// The specific behavior that the modifier will have, not directly related with a player, like destroying a wall
+	virtual void Process() = 0;
+
+protected:
 	EModifierType type = EModifierType::UNSET;
 
 	// A reference to the board
@@ -42,9 +46,6 @@ public:
 	// Tile in where this modifier resides
 	int col = -1;
 	int row = -1;
-
-	// The specific behavior that the modifier will have, not directly related with a player, like destroying a wall
-	virtual void Process() = 0;
 
 	// The effects that this modifier will cause to a player touching it
 	virtual void OnPlayerContact(ABombermanPlayer playerToApply) = 0;
