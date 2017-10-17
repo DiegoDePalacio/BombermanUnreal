@@ -3,13 +3,10 @@
 #include "BlastModifier.h"
 
 BlastModifier::BlastModifier(ABombermanBoard* newBombermanBoard, int newCol, int newRow)
+	: Modifier(newBombermanBoard, newCol, newRow)
 {
 	type = EModifierType::BLAST;
 	timer = new TriggerModifierOnProcessTimer(this, Modifier::TIME_BOMB_IN_SECS);
-
-	board = newBombermanBoard;
-	col = newCol;
-	row = newRow;
 }
 
 BlastModifier::~BlastModifier()

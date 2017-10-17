@@ -49,6 +49,9 @@ protected:
 	int row = -1;
 
 public:
+	Modifier(ABombermanBoard* newBoard, int newCol, int newRow) : board(newBoard), col(newCol), row(newRow) {};
+	virtual ~Modifier() {};
+
 	// The specific behavior that the modifier will have, not directly related with a player, like destroying a wall
 	virtual void Process() = 0;
 
