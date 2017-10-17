@@ -173,6 +173,18 @@ void ABombermanPlayer::AddToSpeed(float amount)
 	}
 }
 
+void ABombermanPlayer::AddToBombCapacity(float amount)
+{
+	if (gameSettings != nullptr)
+	{
+		bombCapacity = FMath::Clamp(speed + amount, gameSettings->MIN_BOMB_CAPACITY, gameSettings->MAX_BOMB_CAPACITY);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("The modifier bomb capacity can't be assigned because the game settings are not available!"));
+	}
+}
+
 bool ABombermanPlayer::CanMove(bool horizontally)
 {
 	// Sanity check, if the game settings are not available, then there is nothing to do

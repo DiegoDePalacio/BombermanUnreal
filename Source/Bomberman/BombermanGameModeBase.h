@@ -23,4 +23,8 @@ public:
 	// Maximum / minimum amount of the player speed 
 	const float MIN_SPEED = 1.0f;
 	const float MAX_SPEED = 5.0f;
+
+	// Maximum / minimum amount of the player bomb capacity
+	const float MIN_BOMB_CAPACITY = 1;
+	const float MAX_BOMB_CAPACITY = 5;
 };

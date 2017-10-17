@@ -74,6 +74,7 @@ public:
 	void DieOnNextFrame();
 
 	void AddToSpeed(float amount);
+	void AddToBombCapacity(float amount);
 
 private:
 	// Is possible to move horizontally / vertically?
