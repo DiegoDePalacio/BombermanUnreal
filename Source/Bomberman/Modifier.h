@@ -54,5 +54,5 @@ public:
 
 protected:
 	// The effects that this modifier will cause to a player touching it
-	virtual void OnPlayerContact(ABombermanPlayer playerToApply) = 0;
+	virtual void OnPlayerContact(ABombermanPlayer* playerToApply) = 0;
 };

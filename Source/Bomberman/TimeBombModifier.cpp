@@ -4,6 +4,9 @@
 
 TimeBombModifier::TimeBombModifier (ABombermanBoard* newBombermanBoard, int newCol, int newRow, ABombermanPlayer * newPlayer, int newLinearExtension)
 {
+	type = EModifierType::OWN_TIME_BOMB;
+	timer = new TriggerModifierOnProcessTimer(this, Modifier::TIME_BOMB_IN_SECS);
+
 	bombermanBoard = newBombermanBoard;
 	col = newCol;
 	row = newRow;
@@ -52,7 +55,7 @@ void TimeBombModifier::Process()
 	DestroyAndBlastOnTile(col, row);
 }
 
-void TimeBombModifier::OnPlayerContact(ABombermanPlayer playerToApply)
+void TimeBombModifier::OnPlayerContact(ABombermanPlayer* playerToApply)
 {
 	// The bomb is innocuous if is not exploding yet
 }

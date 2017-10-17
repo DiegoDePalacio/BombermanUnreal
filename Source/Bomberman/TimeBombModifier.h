@@ -8,7 +8,7 @@
 #include "BombermanPlayer.h"
 
 /**
- * 
+ * Regular type of bomb to explode after some time
  */
 class BOMBERMAN_API TimeBombModifier : public Modifier
 {
@@ -32,10 +32,12 @@ public:
 	TimeBombModifier (ABombermanBoard* newBombermanBoard, int newCol, int newRow, ABombermanPlayer* newPlayer, int newLinearExtension);
 	virtual ~TimeBombModifier();
 
+	// Inherited via Modifier
 	void Process() override;
 
 protected:
-	void OnPlayerContact (ABombermanPlayer playerToApply) override;
+	// Inherited via Modifier
+	void OnPlayerContact (ABombermanPlayer* playerToApply) override;
 
 private:
 	// Trigger any bombs on the specified tile and destroy the things inside
