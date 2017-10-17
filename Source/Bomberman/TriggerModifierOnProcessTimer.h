@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "Modifier.h"
 
 // Forward declaration in order to avoid circular dependencies
 class Modifier;

@@ -2,6 +2,7 @@
 
 #include "BombermanBoard.h"
 #include "BombermanPlayer.h"
+#include "Modifier.h"
 #include "EngineUtils.h"
 #include "Engine/World.h"
 
@@ -23,6 +24,7 @@ void ABombermanBoard::BeginPlay()
 	for (TActorIterator<ABombermanPlayer> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
 		ABombermanPlayer* player = *ActorItr;
+		players.Add(player);
 		player->SetBoard(this);
 	}
 }
@@ -55,7 +57,7 @@ void ABombermanBoard::GenerateBoard()
 	{
 		int newColRows = (col % 2 == 0 ? rows : rowsInOddColumns);
 		
-		tiles.Add(new FBoardCol());
+		tiles.Add(new FBoardDestructibleWallCol());
 
 		for (int row = 0; row < newColRows; ++row)
 		{
@@ -133,6 +135,24 @@ void ABombermanBoard::GenerateBoard()
 	}
 }
 
+// Create an empty "matrix" to be populated later with the modifiers to be used during the game
+void ABombermanBoard::InitModifiersMatrix()
+{
+	int rowsInOddColumns = FGenericPlatformMath::CeilToInt(cols / 2.0f);
+
+	for (int col = 0; col < cols; ++col)
+	{
+		modifierCols.Add(new FBoardModifierCol());
+
+		int newColRows = (col % 2 == 0 ? rows : rowsInOddColumns);
+
+		for (int row = 0; row < newColRows; ++row)
+		{
+			modifierCols[col]->modifiers.Emplace(nullptr);
+		}
+	}
+}
+
 bool ABombermanBoard::IsWalkableTile(int col, int row)
 {
 	return (GetTile(col, row) == nullptr);
@@ -143,20 +163,26 @@ bool ABombermanBoard::IsUndestructibleWall(int col, int row)
 	return (col % 2 != 0 && row % 2 != 0);
 }
 
+bool ABombermanBoard::IsInBoard(int col, int row)
+{
+	if (col < 0) { return false; }
+	if (col >= cols) { return false; }
+	if (row < 0) { return false; }
+	if (row >= rows) { return false; }
+	return true;
+}
+
 ABombermanDestructibleWall* ABombermanBoard::GetTile(int col, int row)
 {
 	// Check first if it's outside of the board
-	if (col < 0) { return nullptr; }
-	if (col >= cols) { return nullptr; }
-	if (row < 0) { return nullptr; }
-	if (row >= rows) { return nullptr; }
+	if (!IsInBoard(col, row)) { return nullptr; }
 
 	// Check if is in a tile with a indestructible wall
 	if (IsUndestructibleWall(col, row)) { return nullptr; }
 
 	if (tiles.Num() <= col) { return nullptr; }
 
-	// If is an even column, check directly on the row number of the FBoardCol instance
+	// If is an even column, check directly on the row number of the FBoardDestructibleWallCol instance
 	if (col % 2 == 0)
 	{
 		if (tiles[col]->destructibleWalls.Num() <= row) { return nullptr; }
@@ -177,5 +203,109 @@ ABombermanDestructibleWall* ABombermanBoard::GetTile(int col, int row)
 void ABombermanBoard::RegisterTimer(TriggerModifierOnProcessTimer* timer)
 {
 	timers.Add(timer);
+}
+
+Modifier* ABombermanBoard::GetModifier(int col, int row)
+{
+	// Check first if it's outside of the board
+	if (!IsInBoard(col, row)) { return nullptr; }
+
+	// Check if is in a tile with a indestructible wall
+	if (IsUndestructibleWall(col, row)) { return nullptr; }
+
+	if (modifierCols.Num() <= col) { return nullptr; }
+
+	// If is an even column, check directly on the row number of the FBoardModifierCol instance
+	if (col % 2 == 0)
+	{
+		if (modifierCols[col]->modifiers.Num() <= row) { return nullptr; }
+
+		return modifierCols[col]->modifiers[row];
+	}
+	else
+	{
+		// If not, first calculate the respective index
+		int rowIndex = FGenericPlatformMath::RoundToInt(row / 2.0f);
+
+		if (modifierCols[col]->modifiers.Num() <= rowIndex) { return nullptr; }
+
+		return modifierCols[col]->modifiers[rowIndex];
+	}
+}
+
+bool ABombermanBoard::SetModifier(Modifier * newModifier, int col, int row)
+{
+	// Check first if it's outside of the board
+	if (!IsInBoard(col, row)) 
+	{ 
+		UE_LOG(LogTemp, Error, TEXT("Trying to set a modifier outside of the board!"));
+		return false;
+	}
+
+	// Check if is in a tile with a indestructible wall
+	// This is not an error, because will be called on explosions
+	if (IsUndestructibleWall(col, row)) 
+	{ 
+		return false; 
+	}
+
+	if (modifierCols.Num() <= col) 
+	{ 
+		UE_LOG(LogTemp, Error, TEXT("The modifier matrix was not initiated on the board!"));
+		return false; 
+	}
+
+	// If is an even column, then the row number should be the same as the index on the FBoardModifierCol instance
+	if (col % 2 == 0)
+	{
+		if (modifierCols[col]->modifiers.Num() <= row) 
+		{
+			UE_LOG(LogTemp, Error, TEXT("The modifier matrix was not initiated on the board!"));
+			return false; 
+		}
+
+		// Destroy the previous modifier if any
+		if (modifierCols[col]->modifiers[row] != nullptr)
+		{
+			delete(modifierCols[col]->modifiers[row]);
+		}
+
+		modifierCols[col]->modifiers[row] = newModifier;
+	}
+	else
+	{
+		// If not, first calculate the respective index
+		int rowIndex = FGenericPlatformMath::RoundToInt(row / 2.0f);
+
+		if (modifierCols[col]->modifiers.Num() <= rowIndex) 
+		{
+			UE_LOG(LogTemp, Error, TEXT("The modifier matrix was not initiated on the board!"));
+			return false;
+		}
+
+		// Destroy the previous modifier if any
+		if (modifierCols[col]->modifiers[rowIndex] != nullptr)
+		{
+			delete(modifierCols[col]->modifiers[rowIndex]);
+		}
+
+		modifierCols[col]->modifiers[rowIndex] = newModifier;
+	}
+
+	return true;
+}
+
+TArray<ABombermanPlayer*> ABombermanBoard::GetPlayersInTile(int col, int row)
+{
+	TArray<ABombermanPlayer*> playersInTile;
+
+	for (auto player : players)
+	{
+		if (player->IsInTile(col, row))
+		{
+			playersInTile.Add(player);
+		}
+	}
+	return playersInTile;
 }
 

@@ -8,12 +8,22 @@
 #include "TriggerModifierOnProcessTimer.h"
 #include "BombermanBoard.generated.h"
 
+// Forward declaration in order to avoid circular dependencies
+class Modifier;
+class ABombermanPlayer;
+
 USTRUCT()
-struct FBoardCol
+struct FBoardDestructibleWallCol
 {
 	GENERATED_USTRUCT_BODY()
-
 	TArray<ABombermanDestructibleWall*> destructibleWalls;
+};
+
+USTRUCT()
+struct FBoardModifierCol
+{
+	GENERATED_USTRUCT_BODY()
+	TArray<Modifier*> modifiers;
 };
 
 UCLASS()
@@ -60,16 +70,26 @@ public:
 	float normalizedProbabilityOfPowerUpInDestructibleWall = 0.3f;
 
 private:
-	TArray<FBoardCol*> tiles;
+	TArray<FBoardDestructibleWallCol*> tiles;
 	TArray<TriggerModifierOnProcessTimer*> timers;
+	TArray<FBoardModifierCol*> modifierCols;
+	TArray<ABombermanPlayer*> players;
 
 private:
 	void GenerateBoard();
+	void InitModifiersMatrix();
 	bool IsUndestructibleWall(int col, int row);
+	bool IsInBoard(int col, int row);
 
 public:
 	bool IsWalkableTile(int col, int row);
+
 	ABombermanDestructibleWall* GetTile(int col, int row);
 
 	void RegisterTimer(TriggerModifierOnProcessTimer* timer);
+
+	Modifier* GetModifier(int col, int row);
+	bool SetModifier(Modifier* newModifier, int col, int row);
+
+	TArray<ABombermanPlayer*> GetPlayersInTile(int col, int row);
 };

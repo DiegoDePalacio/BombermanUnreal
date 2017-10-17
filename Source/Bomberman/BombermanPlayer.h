@@ -45,6 +45,12 @@ private:
 	ABombermanBoard* bombermanBoard = nullptr;
 	float playerDiameter = 0.0f;
 
+	float speed = 1.0f;
+	int bombCapacity = 1;
+	int blastLinearExtension = 1;
+
+	int ongoingBombs = 0;
+
 public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -58,6 +64,14 @@ public:
 	float MoveVertically(float amount);
 
 	void SetBoard(ABombermanBoard* board);
+
+	void DecreaseOnGoingBombs();
+
+	bool IsInTile(int colToCheck, int rowToCheck);
+
+	// Don't kill instantaneously, because the other player can also be killed in the same frame
+	// and then the game is a tie
+	void DieOnNextFrame();
 
 private:
 	// Is possible to move horizontally / vertically?

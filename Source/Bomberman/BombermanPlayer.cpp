@@ -147,6 +147,20 @@ void ABombermanPlayer::SetBoard(ABombermanBoard * board)
 	maxPlayerBoardY = minPlayerBoardY + boardWidth - playerDiameter;
 }
 
+void ABombermanPlayer::DecreaseOnGoingBombs()
+{
+	ongoingBombs--;
+}
+
+bool ABombermanPlayer::IsInTile(int colToCheck, int rowToCheck)
+{
+	return (col == colToCheck && row == rowToCheck);
+}
+
+void ABombermanPlayer::DieOnNextFrame()
+{
+}
+
 bool ABombermanPlayer::CanMove(bool horizontally)
 {
 	// Sanity check, if the game settings are not available, then there is nothing to do
