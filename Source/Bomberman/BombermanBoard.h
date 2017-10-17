@@ -4,7 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "BombermanDestructibleWall.h"
 #include "BombermanBoard.generated.h"
+
+USTRUCT()
+struct FBoardCol
+{
+	GENERATED_USTRUCT_BODY()
+
+	TArray<ABombermanDestructibleWall*> destructibleWalls;
+};
 
 UCLASS()
 class BOMBERMAN_API ABombermanBoard : public AActor
@@ -26,10 +35,33 @@ public:
 #pragma endregion [AActor]
 	
 public:
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	int cols = 0;
+	// TODO: Add the functionlity of create the walls in this class and expose the cols and 
+	// rows variables to allow the creation of different size boards
+	//UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	int cols = 11;
+
+	//UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	int rows = 11;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	int rows = 0;
+	TSubclassOf<ABombermanDestructibleWall> emptyDestructibleWallBP;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	TArray<TSubclassOf<ABombermanDestructibleWall>> destructibleWallsWithPowerUpBP;
+
+	// Probability on the [0,1] range of having a destructible wall on a non-wall board tile 
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	float normalizedProbabilityOfDestructibleWall = 0.0f;
+
+	// Probability on the [0,1] range of having a wall on an board tile with a power-up inside
+	// inside of a destructible wall to be collected after destroying the wall
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	float normalizedProbabilityOfPowerUpInDestructibleWall = 0.3f;
+
+private:
+	TArray<FBoardCol*> tiles;
+
+public:
+	void GenerateBoard();
 
 };

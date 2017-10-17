@@ -31,7 +31,7 @@ public:
 
 public:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	TSubclassOf<class ABombermanBoard> board = NULL;
+	TSubclassOf<class ABombermanBoard> board = nullptr;
 
 private:
 	ABombermanGameModeBase* gameSettings = nullptr;

@@ -51,6 +51,10 @@ void ABombermanPlayer::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Game board not found!"));
 	}
+
+	// TODO: Instantiate the players here, instead of placing them manually on the Unreal editor
+	// in order to assure that they will appear on the "safety" zones of the board (currently the 
+	// bottom-left and top-right corners) 
 }
 
 // Called every frame
@@ -128,7 +132,7 @@ bool ABombermanPlayer::CanDisplace( bool horizontally )
 // The desired movement will place the player inside of the board?
 bool ABombermanPlayer::WillStayInsideTheBoard(bool horizontally, float movementAmount)
 {
-	if (board == NULL) { return false; }
+	if (board == nullptr) { return false; }
 
 	FVector playerPosition = GetActorLocation();
 
