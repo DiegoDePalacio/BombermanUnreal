@@ -15,6 +15,34 @@ ABombermanBoard::ABombermanBoard()
 
 }
 
+ABombermanBoard::~ABombermanBoard()
+{
+	// Clean the destructible walls
+	for (auto tile : tiles)
+	{
+		for (auto wall : tile->destructibleWalls)
+		{
+			if (wall != nullptr)
+			{
+				delete(wall);
+			}
+		}
+		delete(tile);
+	}
+
+	// Clean the modifiers
+	for (auto modifierCol : modifierCols)
+	{
+		for (auto modifier : modifierCol->modifiers)
+		{
+			if (modifier != nullptr)
+			{
+				delete(modifier);
+			}
+		}
+	}
+}
+
 // Called when the game starts or when spawned
 void ABombermanBoard::BeginPlay()
 {

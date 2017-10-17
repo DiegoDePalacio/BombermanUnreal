@@ -13,6 +13,7 @@ TimeBombModifier::TimeBombModifier (ABombermanBoard* newBombermanBoard, int newC
 
 TimeBombModifier::~TimeBombModifier()
 {
+	delete(timer);
 }
 
 void TimeBombModifier::Process()

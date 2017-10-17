@@ -35,6 +35,7 @@ class BOMBERMAN_API ABombermanBoard : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABombermanBoard();
+	~ABombermanBoard();
 
 protected:
 	// Called when the game starts or when spawned
