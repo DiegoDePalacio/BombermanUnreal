@@ -122,7 +122,7 @@ float ABombermanPlayer::MoveVertically(float amount)
 
 		// Trigger all the modifiers in the player way to the new row
 		int playerDirection = (newRow < row ? -1 : 1);
-		TouchHorizontalModifiers(newRow, playerDirection);
+		TouchVerticalModifiers(newRow, playerDirection);
 	}
 
 	// Otherwise allow the full movement
