@@ -18,4 +18,6 @@ public:
 public:
 	TimeBombModifier (ABombermanBoard* newBombermanBoard, int newCol, int newRow, ABombermanPlayer* newPlayer, int newLinearExtension);
 	virtual ~TimeBombModifier();
+
+	void Process() override;
 };

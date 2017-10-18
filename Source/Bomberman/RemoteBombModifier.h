@@ -26,7 +26,7 @@ public:
 	virtual ~RemoteBombModifier();
 
 	// Inherited via Modifier
-	void Process() override;
+	virtual void Process() override;
 	void OnPlayerContact(ABombermanPlayer* playerToApply) override;
 
 private:

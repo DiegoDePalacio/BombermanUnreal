@@ -117,6 +117,7 @@ public:
 	ABombermanDestructibleWall* GetTile(int col, int row);
 
 	void RegisterTimer(TriggerModifierOnProcessTimer* timer);
+	void UnregisterTimer(TriggerModifierOnProcessTimer* timer);
 
 	Modifier* GetModifier(int col, int row);
 	bool SetModifier(Modifier* newModifier, int col, int row);

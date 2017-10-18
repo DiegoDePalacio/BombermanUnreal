@@ -7,9 +7,17 @@ TimeBombModifier::TimeBombModifier (ABombermanBoard* newBombermanBoard, int newC
 {
 	type = EModifierType::OWN_TIME_BOMB;
 	timer = new TriggerModifierOnProcessTimer(this, Modifier::TIME_BOMB_IN_SECS);
+
+	board->RegisterTimer(timer);
 }
 
 TimeBombModifier::~TimeBombModifier()
 {
 	delete(timer);
+}
+
+void TimeBombModifier::Process()
+{
+	RemoteBombModifier::Process();
+	board->UnregisterTimer(timer);
 }

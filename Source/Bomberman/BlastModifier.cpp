@@ -7,6 +7,8 @@ BlastModifier::BlastModifier(ABombermanBoard* newBombermanBoard, int newCol, int
 {
 	type = EModifierType::BLAST;
 	timer = new TriggerModifierOnProcessTimer(this, Modifier::TIME_BOMB_IN_SECS);
+
+	board->RegisterTimer(timer);
 }
 
 BlastModifier::~BlastModifier()
@@ -16,7 +18,9 @@ BlastModifier::~BlastModifier()
 
 void BlastModifier::Process()
 {
-	// Just destroy this modifier after his time is over
+	board->UnregisterTimer(timer);
+
+	// Destroy this modifier after his time is over
 	board->SetModifier(nullptr, col, row);
 }
 

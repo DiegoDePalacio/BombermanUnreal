@@ -237,6 +237,11 @@ void ABombermanBoard::RegisterTimer(TriggerModifierOnProcessTimer* timer)
 	timers.Add(timer);
 }
 
+void ABombermanBoard::UnregisterTimer(TriggerModifierOnProcessTimer* timer)
+{
+	timers.Remove(timer);
+}
+
 Modifier* ABombermanBoard::GetModifier(int col, int row)
 {
 	// Check first if it's outside of the board
