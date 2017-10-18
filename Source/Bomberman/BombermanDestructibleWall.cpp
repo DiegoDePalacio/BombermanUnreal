@@ -25,8 +25,3 @@ void ABombermanDestructibleWall::Tick(float DeltaTime)
 
 }
 
-void ABombermanDestructibleWall::Destroy()
-{
-	// TODO: Instantiate the power-up if any in this tile
-}
-
