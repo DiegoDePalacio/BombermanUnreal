@@ -40,6 +40,9 @@ public:
 	// Useful for our RTTI system
 	EModifierType type = EModifierType::UNSET;
 
+	// A reference to the visual representation of the modifier
+	AActor* visual = nullptr;
+
 protected:
 	// A reference to the board
 	ABombermanBoard* board = nullptr;
