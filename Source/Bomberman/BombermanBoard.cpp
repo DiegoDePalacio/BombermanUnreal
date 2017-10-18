@@ -373,12 +373,12 @@ TArray<ABombermanPlayer*> ABombermanBoard::GetPlayersInTile(int col, int row)
 	return playersInTile;
 }
 
-void ABombermanBoard::OnWallDestroyed(int col, int row)
+bool ABombermanBoard::DestroyWall(int col, int row)
 {
 	AActor* wallToDestroy = GetTile(col, row);
 
 	// If there is no wall, then there is nothing to do
-	if (wallToDestroy == nullptr) { return; }
+	if (wallToDestroy == nullptr) { return false; }
 
 	// Remove the visual model
 	wallToDestroy->Destroy();
@@ -397,7 +397,7 @@ void ABombermanBoard::OnWallDestroyed(int col, int row)
 		if (gameSettings == nullptr)
 		{
 			UE_LOG(LogTemp, Error, TEXT("Game settings not found!"));
-			return;
+			return false;
 		}
 
 		// Cases shrinked to improve readability
@@ -414,5 +414,7 @@ void ABombermanBoard::OnWallDestroyed(int col, int row)
 		modifierCols[col]->modifiers[rowIndex] = modifier;
 		SpawnModifierVisual(col, rowIndex);
 	}
+
+	return true;
 }
 

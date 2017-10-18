@@ -125,5 +125,5 @@ public:
 
 	TArray<ABombermanPlayer*> GetPlayersInTile(int col, int row);
 
-	void OnWallDestroyed(int col, int row);
+	bool DestroyWall(int col, int row);
 };
