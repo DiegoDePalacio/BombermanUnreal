@@ -24,13 +24,6 @@ ABombermanBoard::~ABombermanBoard()
 	// Clean the destructible walls
 	for (auto tile : tiles)
 	{
-		for (auto wall : tile->destructibleWalls)
-		{
-			if (wall != nullptr)
-			{
-				delete(wall);
-			}
-		}
 		delete(tile);
 	}
 
