@@ -327,6 +327,7 @@ bool ABombermanBoard::SetModifier(Modifier* newModifier, int col, int row)
 		{
 			modifierCols[col]->modifiers[row]->visual->Destroy();
 			delete(modifierCols[col]->modifiers[row]);
+			modifierCols[col]->modifiers[row] = nullptr;
 		}
 
 		modifierCols[col]->modifiers[row] = newModifier;
@@ -348,6 +349,7 @@ bool ABombermanBoard::SetModifier(Modifier* newModifier, int col, int row)
 		{
 			modifierCols[col]->modifiers[rowIndex]->visual->Destroy();
 			delete(modifierCols[col]->modifiers[rowIndex]);
+			modifierCols[col]->modifiers[rowIndex] = nullptr;
 		}
 
 		modifierCols[col]->modifiers[rowIndex] = newModifier;
