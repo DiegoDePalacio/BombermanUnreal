@@ -18,6 +18,6 @@ TimeBombModifier::~TimeBombModifier()
 
 void TimeBombModifier::Process()
 {
-	RemoteBombModifier::Process();
 	board->UnregisterTimer(timer);
+	RemoteBombModifier::Process();
 }
