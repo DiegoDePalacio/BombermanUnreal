@@ -96,4 +96,8 @@ private:
 	
 	// The desired movement will place the player inside of the board?
 	bool WillStayInsideTheBoard(bool horizontally, float movementAmount);
+
+	// Trigger the Modifier.OnPlayerTouch of the modifiers that are on the way of the player while moving to a new column / row
+	void TouchHorizontalModifiers(int newCol, int direction);
+	void TouchVerticalModifiers(int newRow, int direction);
 };

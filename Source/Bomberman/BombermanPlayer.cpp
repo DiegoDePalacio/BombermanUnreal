@@ -79,6 +79,10 @@ float ABombermanPlayer::MoveHorizontally(float amount)
 
 		// Only change the col if the center of the player is inside of the new col
 		col = FGenericPlatformMath::RoundToInt((playerPosition.Y + amount) * 0.01f);
+
+		// Trigger all the modifiers in the player way to the new column
+		int playerDirection = (newCol < col ? -1 : 1);
+		TouchHorizontalModifiers(newCol, playerDirection);
 	}
 
 	// Otherwise allow the full movement
@@ -115,6 +119,10 @@ float ABombermanPlayer::MoveVertically(float amount)
 
 		// Only change the row if the center of the player is inside of the new row
 		row = FGenericPlatformMath::RoundToInt((playerPosition.X + amount) * 0.01f);
+
+		// Trigger all the modifiers in the player way to the new row
+		int playerDirection = (newRow < row ? -1 : 1);
+		TouchHorizontalModifiers(newRow, playerDirection);
 	}
 
 	// Otherwise allow the full movement
@@ -146,6 +154,7 @@ void ABombermanPlayer::ActionButtonPressed()
 		{
 			bombermanBoard->SetModifier(new TimeBombModifier(bombermanBoard, col, row, this, blastLinearExtension), col, row);
 		}
+		ongoingBombs++;
 	}
 }
 
@@ -285,6 +294,36 @@ bool ABombermanPlayer::WillStayInsideTheBoard(bool horizontally, float movementA
 		if (playerPosition.X + movementAmount < minPlayerBoardX) { return false; }
 		if (playerPosition.X + movementAmount > maxPlayerBoardX) { return false; }
 		return true;
+	}
+}
+
+// Trigger the Modifier.OnPlayerTouch of the modifiers that are on the way of the player while moving to a new column
+void ABombermanPlayer::TouchHorizontalModifiers(int newCol, int direction)
+{
+	// Check and trigger the Modifier.OnContact in order, in all the columns in between the player movement
+	for (int crossedCol = col + direction; crossedCol != newCol + direction; crossedCol += direction)
+	{
+		Modifier* modifier = bombermanBoard->GetModifier(crossedCol, row);
+
+		if (modifier != nullptr)
+		{
+			modifier->OnPlayerContact(this);
+		}
+	}
+}
+
+// Trigger the Modifier.OnPlayerTouch of the modifiers that are on the way of the player while moving to a new row
+void ABombermanPlayer::TouchVerticalModifiers(int newRow, int direction)
+{
+	// Check and trigger the Modifier.OnContact in order, in all the rows in between the player movement
+	for (int crossedRow = row + direction; crossedRow != newRow + direction; crossedRow += direction)
+	{
+		Modifier* modifier = bombermanBoard->GetModifier(crossedRow, col);
+
+		if (modifier != nullptr)
+		{
+			modifier->OnPlayerContact(this);
+		}
 	}
 }
 
