@@ -62,26 +62,28 @@ void RemoteBombModifier::CheckForBlastOnTile(int blastCol, int blastRow)
 
 	Modifier* modifier = board->GetModifier(blastCol, blastRow);
 
-	if (modifier == nullptr) { return; }
-
-	// If it's already a BLAST, then nothing to do
-	if (modifier->type == EModifierType::BLAST) { return; }
-
-	// If the blast affect a bomb, the make the bomb explode
-	if (modifier->type == EModifierType::OWN_REMOTE_BOMB || modifier->type == EModifierType::OWN_TIME_BOMB)
+	if (modifier != nullptr)
 	{
-		RemoteBombModifier* bomb = static_cast<RemoteBombModifier*>(modifier);
+		// If there is already a blast, then there is nothing to destroy
+		if (modifier->type == EModifierType::BLAST) { return; }
 
-		//...only if the affected bomb was not already triggered
-		if (!bomb->ongoing)
+		// If the blast affect a bomb, the make the bomb explode
+		if (modifier->type == EModifierType::OWN_REMOTE_BOMB || modifier->type == EModifierType::OWN_TIME_BOMB)
 		{
-			modifier->Process();
+			RemoteBombModifier* bomb = static_cast<RemoteBombModifier*>(modifier);
+
+			//...only if the affected bomb was not already triggered
+			if (!bomb->ongoing)
+			{
+				modifier->Process();
+			}
+
+			// If there is a bomb exploding or about to explode, this bomb will take care of the destruction instead
+			return;
 		}
 	}
-	else
-	{
-		DestroyAndBlastOnTile(blastCol, blastRow);
-	}
+
+	DestroyAndBlastOnTile(blastCol, blastRow);
 }
 
 // Kill and destroy all the power-ups and destructible walls on the tile to be the place of the blast
