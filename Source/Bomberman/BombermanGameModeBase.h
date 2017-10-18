@@ -25,6 +25,10 @@ public:
 	const float MAX_SPEED = 5.0f;
 
 	// Maximum / minimum amount of the player bomb capacity
-	const float MIN_BOMB_CAPACITY = 1;
-	const float MAX_BOMB_CAPACITY = 5;
+	const int MIN_BOMB_CAPACITY = 1;
+	const int MAX_BOMB_CAPACITY = 5;
+
+	// Maximum / minimum amount of the blast extension that the player can have on the bombs
+	const int MIN_BLAST_EXTENSION = 1;
+	const int MAX_BLAST_EXTENSION = 5;
 };

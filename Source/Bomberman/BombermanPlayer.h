@@ -73,8 +73,10 @@ public:
 	// and then the game is a tie
 	void DieOnNextFrame();
 
+	// Methods used by the power-ups to modify the player variables
 	void AddToSpeed(float amount);
-	void AddToBombCapacity(float amount);
+	void AddToBombCapacity(int amount);
+	void AddToBlastLinearExtension(int amount);
 
 private:
 	// Is possible to move horizontally / vertically?

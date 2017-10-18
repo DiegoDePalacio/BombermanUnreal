@@ -173,15 +173,27 @@ void ABombermanPlayer::AddToSpeed(float amount)
 	}
 }
 
-void ABombermanPlayer::AddToBombCapacity(float amount)
+void ABombermanPlayer::AddToBombCapacity(int amount)
 {
 	if (gameSettings != nullptr)
 	{
-		bombCapacity = FMath::Clamp(speed + amount, gameSettings->MIN_BOMB_CAPACITY, gameSettings->MAX_BOMB_CAPACITY);
+		bombCapacity = FMath::Clamp(bombCapacity + amount, gameSettings->MIN_BOMB_CAPACITY, gameSettings->MAX_BOMB_CAPACITY);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("The modifier bomb capacity can't be assigned because the game settings are not available!"));
+	}
+}
+
+void ABombermanPlayer::AddToBlastLinearExtension(int amount)
+{
+	if (gameSettings != nullptr)
+	{
+		blastLinearExtension = FMath::Clamp(blastLinearExtension + amount, gameSettings->MIN_BLAST_EXTENSION, gameSettings->MAX_BLAST_EXTENSION);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("The modifier for increase the blast range can't be assigned because the game settings are not available!"));
 	}
 }
 
