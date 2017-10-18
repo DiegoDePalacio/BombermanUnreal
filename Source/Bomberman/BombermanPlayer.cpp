@@ -197,6 +197,16 @@ void ABombermanPlayer::AddToBlastLinearExtension(int amount)
 	}
 }
 
+void ABombermanPlayer::AddRemoteBomb()
+{
+	hasRemote = true;
+}
+
+void ABombermanPlayer::RemoveRemoteBomb()
+{
+	hasRemote = false;
+}
+
 bool ABombermanPlayer::CanMove(bool horizontally)
 {
 	// Sanity check, if the game settings are not available, then there is nothing to do

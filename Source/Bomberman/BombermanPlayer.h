@@ -51,6 +51,8 @@ private:
 
 	int ongoingBombs = 0;
 
+	bool hasRemote = false;
+
 public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -77,6 +79,9 @@ public:
 	void AddToSpeed(float amount);
 	void AddToBombCapacity(int amount);
 	void AddToBlastLinearExtension(int amount);
+
+	void AddRemoteBomb();
+	void RemoveRemoteBomb();
 
 private:
 	// Is possible to move horizontally / vertically?
