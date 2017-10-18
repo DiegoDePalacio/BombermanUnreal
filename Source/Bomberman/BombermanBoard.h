@@ -110,6 +110,7 @@ private:
 	bool IsUndestructibleWall(int col, int row);
 	bool IsInBoard(int col, int row);
 	void SpawnModifierVisual(int col, int row);
+	void SetTileAsEmpty(int col, int row);
 
 public:
 	bool IsWalkableTile(int col, int row);

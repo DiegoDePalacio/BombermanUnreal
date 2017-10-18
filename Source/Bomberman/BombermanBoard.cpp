@@ -197,6 +197,34 @@ void ABombermanBoard::SpawnModifierVisual(int col, int row)
 		->SpawnActor<AActor>(visualToSpawn, visualPosition, FRotator(0, 0, 0));
 }
 
+void ABombermanBoard::SetTileAsEmpty(int col, int row)
+{
+	// Check first if it's outside of the board
+	if (!IsInBoard(col, row)) { return; }
+
+	// Check if is in a tile with a indestructible wall
+	if (IsUndestructibleWall(col, row)) { return; }
+
+	if (tiles.Num() <= col) { return; }
+
+	// If is an even column, set directly on the row number of the FBoardDestructibleWallCol instance
+	if (col % 2 == 0)
+	{
+		if (tiles[col]->destructibleWalls.Num() <= row) { return; }
+
+		tiles[col]->destructibleWalls[row] = nullptr;
+	}
+	else
+	{
+		// If not, first calculate the respective index
+		int rowIndex = FGenericPlatformMath::RoundToInt(row / 2.0f);
+
+		if (tiles[col]->destructibleWalls.Num() <= rowIndex) { return; }
+
+		tiles[col]->destructibleWalls[rowIndex] = nullptr;
+	}
+}
+
 ABombermanDestructibleWall* ABombermanBoard::GetTile(int col, int row)
 {
 	// Check first if it's outside of the board
@@ -352,6 +380,7 @@ void ABombermanBoard::OnWallDestroyed(int col, int row)
 
 	// Remove the visual model
 	wallToDestroy->Destroy();
+	SetTileAsEmpty(col, row);
 
 	if (FGenericPlatformMath::FRand() < normalizedProbabilityOfPowerUpInDestructibleWall)
 	{
