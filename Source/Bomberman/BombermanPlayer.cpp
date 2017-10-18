@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BombermanPlayer.h"
+#include "TimeBombModifier.h"
 #include "Engine/World.h"
 
 
@@ -118,6 +119,34 @@ float ABombermanPlayer::MoveVertically(float amount)
 
 	// Otherwise allow the full movement
 	return amount;
+}
+
+void ABombermanPlayer::ActionButtonPressed()
+{
+	// If the player has the control of a remote bomb, then explode it
+	if (remoteBomb != nullptr)
+	{
+		remoteBomb->Process();
+		remoteBomb = nullptr;
+		return;
+	}
+
+	// If the player has some bomb / bombs that can be placed, then place one in his position
+	if (ongoingBombs < bombCapacity)
+	{
+		// Don't allow to place a bomb on top of another modifier
+		if (bombermanBoard->GetModifier(col, row)) { return; }
+
+		if( hasRemote )
+		{
+			remoteBomb = new RemoteBombModifier(bombermanBoard, col, row, this, blastLinearExtension);
+			bombermanBoard->SetModifier(remoteBomb, col, row);
+		}
+		else
+		{
+			bombermanBoard->SetModifier(new TimeBombModifier(bombermanBoard, col, row, this, blastLinearExtension), col, row);
+		}
+	}
 }
 
 void ABombermanPlayer::SetBoard(ABombermanBoard * board)

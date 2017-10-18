@@ -10,6 +10,8 @@
 #include "BombermanBoard.h"
 #include "BombermanPlayer.generated.h"
 
+class RemoteBombModifier;
+
 UCLASS()
 class BOMBERMAN_API ABombermanPlayer : public APawn
 {
@@ -52,6 +54,7 @@ private:
 	int ongoingBombs = 0;
 
 	bool hasRemote = false;
+	RemoteBombModifier* remoteBomb = nullptr;
 
 public:
 	// Called to bind functionality to input
@@ -64,6 +67,10 @@ public:
 	// Try to move the player vertically
 	UFUNCTION(BlueprintCallable)
 	float MoveVertically(float amount);
+
+	// The action button was pressed
+	UFUNCTION(BlueprintCallable)
+	void ActionButtonPressed();
 
 	void SetBoard(ABombermanBoard* board);
 
