@@ -62,6 +62,8 @@ void RemoteBombModifier::CheckForBlastOnTile(int blastCol, int blastRow)
 
 	Modifier* modifier = board->GetModifier(blastCol, blastRow);
 
+	if (modifier == nullptr) { return; }
+
 	// If it's already a BLAST, then nothing to do
 	if (modifier->type == EModifierType::BLAST) { return; }
 
