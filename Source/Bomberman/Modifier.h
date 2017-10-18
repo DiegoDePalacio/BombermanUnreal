@@ -55,7 +55,6 @@ public:
 	// The specific behavior that the modifier will have, not directly related with a player, like destroying a wall
 	virtual void Process() = 0;
 
-protected:
 	// The effects that this modifier will cause to a player touching it
 	virtual void OnPlayerContact(ABombermanPlayer* playerToApply) = 0;
 };
