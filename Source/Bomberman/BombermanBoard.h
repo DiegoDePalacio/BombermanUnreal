@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "BombermanGameModeBase.h"
 #include "BombermanDestructibleWall.h"
 #include "TriggerModifierOnProcessTimer.h"
 #include "BombermanBoard.generated.h"
@@ -58,8 +59,27 @@ public:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 	TSubclassOf<ABombermanDestructibleWall> emptyDestructibleWallBP;
 
+	// TODO: Replace these visual variables for an array of a custom class with modifiable probabilities
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	TArray<TSubclassOf<ABombermanDestructibleWall>> destructibleWallsWithPowerUpBP;
+	TSubclassOf<AActor> visualBlast;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	TSubclassOf<AActor> visualTimeBomb;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	TSubclassOf<AActor> visualRemoteBomb;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	TSubclassOf<AActor> visualSpeedPowerUp;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	TSubclassOf<AActor> visualBombCapacityPowerUp;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	TSubclassOf<AActor> visualBombBlastPowerUp;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	TSubclassOf<AActor> visualRemoteBombPowerUp;
 
 	// Probability on the [0,1] range of having a destructible wall on a non-wall board tile 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
@@ -71,16 +91,25 @@ public:
 	float normalizedProbabilityOfPowerUpInDestructibleWall = 0.3f;
 
 private:
+	ABombermanGameModeBase* gameSettings = nullptr;
+
 	TArray<FBoardDestructibleWallCol*> tiles;
 	TArray<TriggerModifierOnProcessTimer*> timers;
 	TArray<FBoardModifierCol*> modifierCols;
 	TArray<ABombermanPlayer*> players;
+
+	// TODO: Make this available and configurable in the editor in order to be able to choose which 
+	// power-ups will appear on a current level
+
+	// The number of power ups implemented on the game
+	const int AVAILABLE_POWER_UPS = 4;
 
 private:
 	void GenerateBoard();
 	void InitModifiersMatrix();
 	bool IsUndestructibleWall(int col, int row);
 	bool IsInBoard(int col, int row);
+	void SpawnModifierVisual(int col, int row);
 
 public:
 	bool IsWalkableTile(int col, int row);
@@ -93,4 +122,6 @@ public:
 	bool SetModifier(Modifier* newModifier, int col, int row);
 
 	TArray<ABombermanPlayer*> GetPlayersInTile(int col, int row);
+
+	void OnWallDestroyed(int col, int row);
 };

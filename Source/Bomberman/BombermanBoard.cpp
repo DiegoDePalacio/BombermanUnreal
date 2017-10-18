@@ -3,6 +3,10 @@
 #include "BombermanBoard.h"
 #include "BombermanPlayer.h"
 #include "Modifier.h"
+#include "CollectSpeedModifier.h"
+#include "CollectBombCapacityModifier.h"
+#include "CollectBombBlastModifier.h"
+#include "CollectRemoteBombModifier.h"
 #include "EngineUtils.h"
 #include "Engine/World.h"
 
@@ -47,6 +51,14 @@ ABombermanBoard::~ABombermanBoard()
 void ABombermanBoard::BeginPlay()
 {
 	Super::BeginPlay();
+	gameSettings = GetWorld()->GetAuthGameMode<ABombermanGameModeBase>();
+
+	if (gameSettings == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Game settings not found!"));
+	}
+
+	InitModifiersMatrix();
 	GenerateBoard();
 
 	for (TActorIterator<ABombermanPlayer> ActorItr(GetWorld()); ActorItr; ++ActorItr)
@@ -112,48 +124,11 @@ void ABombermanBoard::GenerateBoard()
 
 			if (FGenericPlatformMath::FRand() < normalizedProbabilityOfDestructibleWall)
 			{
-				// For simplicity reasons, the tile size is 1 square meters
-				// Unreal unit by default is centimeter
 				FVector wallPosition = FVector(realRow * 100.0f, col * 100.0f, 0.0f);
 
-				if(FGenericPlatformMath::FRand() < normalizedProbabilityOfPowerUpInDestructibleWall)
-				{
-					if (destructibleWallsWithPowerUpBP.Num() > 0)
-					{
-						// TODO: Make the randomness of the power-up tiles non-equal and configurable
-
-						// Choose one index of the possible power-ups randomly
-						int powerUpIndex = FMath::RandRange(0, destructibleWallsWithPowerUpBP.Num() - 1);
-
-						if (destructibleWallsWithPowerUpBP[powerUpIndex] != nullptr)
-						{
-							ABombermanDestructibleWall* newPowerUpWall = GetWorld()
-								->SpawnActor<ABombermanDestructibleWall>(destructibleWallsWithPowerUpBP[powerUpIndex], wallPosition, FRotator(0, 0, 0));
-							tiles[col]->destructibleWalls.Add(newPowerUpWall);
-						}
-						else
-						{
-							UE_LOG(LogTemp, Error, TEXT("There is a missing power-up wall in blueprint array on the board (%i)!"), powerUpIndex);
-						}
-					}
-					else
-					{
-						UE_LOG(LogTemp, Error, TEXT("The power-up wall blueprint array is empty on the board!"));
-					}
-				}
-				else
-				{
-					if (emptyDestructibleWallBP != nullptr)
-					{
-						ABombermanDestructibleWall* newEmptyWall = GetWorld()
-							->SpawnActor<ABombermanDestructibleWall>(emptyDestructibleWallBP, wallPosition, FRotator(0, 0, 0));
-						tiles[col]->destructibleWalls.Add(newEmptyWall);
-					}
-					else
-					{
-						UE_LOG(LogTemp, Error, TEXT("The empty wall blueprint was not assigned on the board!"));
-					}
-				}
+				ABombermanDestructibleWall* newEmptyWall = GetWorld()
+					->SpawnActor<ABombermanDestructibleWall>(emptyDestructibleWallBP, wallPosition, FRotator(0, 0, 0));
+				tiles[col]->destructibleWalls.Add(newEmptyWall);
 			}
 			else
 			{
@@ -198,6 +173,35 @@ bool ABombermanBoard::IsInBoard(int col, int row)
 	if (row < 0) { return false; }
 	if (row >= rows) { return false; }
 	return true;
+}
+
+// Create the visual model for the modifier on the provided position
+void ABombermanBoard::SpawnModifierVisual(int col, int row)
+{
+	Modifier* modifier = GetModifier(col, row);
+
+	// If there is no associated modifier, then there is nothing to spawn
+	if (modifier == nullptr) { return; }
+
+	TSubclassOf<AActor> visualToSpawn;
+
+	// Cases shrinked to improve readability
+	switch (modifier->type)
+	{
+		case EModifierType::BLAST:				{ visualToSpawn = visualBlast;				 break; }
+		case EModifierType::OWN_REMOTE_BOMB:	{ visualToSpawn = visualRemoteBomb;			 break; }
+		case EModifierType::OWN_TIME_BOMB:		{ visualToSpawn = visualTimeBomb;			 break; }
+		case EModifierType::PERM_BOMB_BLAST:	{ visualToSpawn = visualBombBlastPowerUp;	 break; }
+		case EModifierType::PERM_BOMB_CAPACITY: { visualToSpawn = visualBombCapacityPowerUp; break; }
+		case EModifierType::PERM_SPEED:			{ visualToSpawn = visualSpeedPowerUp;		 break; }
+		case EModifierType::TEMP_REMOTE_BOMB:	{ visualToSpawn = visualRemoteBombPowerUp;   break; }
+		default: { return; } // No visual for the specified modifier
+	}
+
+	FVector visualPosition = FVector(row * 100.0f, col * 100.0f, 0.0f);
+
+	modifier->visual = GetWorld()
+		->SpawnActor<AActor>(visualToSpawn, visualPosition, FRotator(0, 0, 0));
 }
 
 ABombermanDestructibleWall* ABombermanBoard::GetTile(int col, int row)
@@ -261,7 +265,7 @@ Modifier* ABombermanBoard::GetModifier(int col, int row)
 	}
 }
 
-bool ABombermanBoard::SetModifier(Modifier * newModifier, int col, int row)
+bool ABombermanBoard::SetModifier(Modifier* newModifier, int col, int row)
 {
 	// Check first if it's outside of the board
 	if (!IsInBoard(col, row)) 
@@ -295,10 +299,12 @@ bool ABombermanBoard::SetModifier(Modifier * newModifier, int col, int row)
 		// Destroy the previous modifier if any
 		if (modifierCols[col]->modifiers[row] != nullptr)
 		{
+			modifierCols[col]->modifiers[row]->visual->Destroy();
 			delete(modifierCols[col]->modifiers[row]);
 		}
 
 		modifierCols[col]->modifiers[row] = newModifier;
+		SpawnModifierVisual(col, row);
 	}
 	else
 	{
@@ -314,10 +320,12 @@ bool ABombermanBoard::SetModifier(Modifier * newModifier, int col, int row)
 		// Destroy the previous modifier if any
 		if (modifierCols[col]->modifiers[rowIndex] != nullptr)
 		{
+			modifierCols[col]->modifiers[rowIndex]->visual->Destroy();
 			delete(modifierCols[col]->modifiers[rowIndex]);
 		}
 
 		modifierCols[col]->modifiers[rowIndex] = newModifier;
+		SpawnModifierVisual(col, rowIndex);
 	}
 
 	return true;
@@ -335,5 +343,47 @@ TArray<ABombermanPlayer*> ABombermanBoard::GetPlayersInTile(int col, int row)
 		}
 	}
 	return playersInTile;
+}
+
+void ABombermanBoard::OnWallDestroyed(int col, int row)
+{
+	AActor* wallToDestroy = GetTile(col, row);
+
+	// If there is no wall, then there is nothing to do
+	if (wallToDestroy == nullptr) { return; }
+
+	// Remove the visual model
+	wallToDestroy->Destroy();
+
+	if (FGenericPlatformMath::FRand() < normalizedProbabilityOfPowerUpInDestructibleWall)
+	{
+		// TODO: Make the randomness of the power-up tiles non-equal and configurable
+		// also replace this 
+
+		// Choose one of the possible power-ups randomly
+		int powerUpType = FMath::RandRange(0, AVAILABLE_POWER_UPS-1);
+
+		Modifier* modifier = nullptr;
+
+		if (gameSettings == nullptr)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Game settings not found!"));
+			return;
+		}
+
+		// Cases shrinked to improve readability
+		switch (powerUpType)
+		{
+			case 1: { modifier = new CollectSpeedModifier(this, col, row, gameSettings->POWER_UP_SPEED); break; }
+			case 2: { modifier = new CollectBombCapacityModifier(this, col, row, gameSettings->POWER_UP_BOMB_CAPACITY); break; }
+			case 3: { modifier = new CollectBombBlastModifier(this, col, row, gameSettings->POWER_UP_BOMB_BLAST); break; }
+			default: { modifier = new CollectRemoteBombModifier(this, col, row, gameSettings->POWER_UP_REMOTE_BOMB); break; }
+		}
+
+		int rowIndex = ( col % 2 == 0 ? row : FGenericPlatformMath::RoundToInt(row / 2.0f) );
+
+		modifierCols[col]->modifiers[rowIndex] = modifier;
+		SpawnModifierVisual(col, rowIndex);
+	}
 }
 
