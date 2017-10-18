@@ -67,9 +67,9 @@ void ABombermanBoard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	for (auto timer : timers)
+	for (int i = timers.Num(); i >= 0; --i)
 	{
-		timer->Update(DeltaTime);
+		timers[i]->Update(DeltaTime);
 	}
 }
 
