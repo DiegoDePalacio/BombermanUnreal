@@ -22,7 +22,7 @@ public:
 
 	// Maximum / minimum amount of the player speed 
 	const float MIN_SPEED = 1.0f;
-	const float MAX_SPEED = 5.0f;
+	const float MAX_SPEED = 3.0f;
 
 	// Maximum / minimum amount of the player bomb capacity
 	const int MIN_BOMB_CAPACITY = 1;
@@ -31,4 +31,10 @@ public:
 	// Maximum / minimum amount of the blast extension that the player can have on the bombs
 	const int MIN_BLAST_EXTENSION = 1;
 	const int MAX_BLAST_EXTENSION = 5;
+
+	// Power-ups amounts to be granted to the player collecting them
+	const float POWER_UP_SPEED = 0.5f;
+	const int POWER_UP_BOMB_CAPACITY = 1;
+	const int POWER_UP_BOMB_BLAST = 1;
+	const float POWER_UP_REMOTE_BOMB = 10.0f;
 };
