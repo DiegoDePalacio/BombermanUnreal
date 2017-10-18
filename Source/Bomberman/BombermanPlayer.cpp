@@ -318,7 +318,7 @@ void ABombermanPlayer::TouchVerticalModifiers(int newRow, int direction)
 	// Check and trigger the Modifier.OnContact in order, in all the rows in between the player movement
 	for (int crossedRow = row + direction; crossedRow != newRow + direction; crossedRow += direction)
 	{
-		Modifier* modifier = bombermanBoard->GetModifier(crossedRow, col);
+		Modifier* modifier = bombermanBoard->GetModifier(col, crossedRow);
 
 		if (modifier != nullptr)
 		{
