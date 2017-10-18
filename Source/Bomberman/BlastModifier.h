@@ -20,8 +20,5 @@ public:
 
 	// Inherited via Modifier
 	virtual void Process() override;
-
-protected:
-	// Inherited via Modifier
 	virtual void OnPlayerContact(ABombermanPlayer* playerToApply) override;
 };
