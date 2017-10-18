@@ -6,7 +6,7 @@ BlastModifier::BlastModifier(ABombermanBoard* newBombermanBoard, int newCol, int
 	: Modifier(newBombermanBoard, newCol, newRow)
 {
 	type = EModifierType::BLAST;
-	timer = new TriggerModifierOnProcessTimer(this, Modifier::TIME_BOMB_IN_SECS);
+	timer = new TriggerModifierOnProcessTimer(this, Modifier::BLAST_DURATION_IN_SECS);
 
 	board->RegisterTimer(timer);
 }
