@@ -418,5 +418,13 @@ Modifier* ABombermanBoard::DestroyWall(int col, int row)
 
 	return nullptr;
 }
+
+// Is inside the board and not a indestructible wall?
+bool ABombermanBoard::IsPlayableTile(int col, int row)
+{
+	if (!IsInBoard(col, row)) { return false; }
+
+	// Is a tile without a indestructible wall?
+	return (col % 2 == 0 || row % 2 == 0);
 }
 

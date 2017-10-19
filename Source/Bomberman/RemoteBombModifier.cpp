@@ -57,6 +57,8 @@ void RemoteBombModifier::OnPlayerContact(ABombermanPlayer* playerToApply)
 // Trigger any bombs that are on the tile to be blasted and call the method for destroying the things inside 
 void RemoteBombModifier::CheckForBlastOnTile(int blastCol, int blastRow)
 {
+	if (!board->IsPlayableTile(blastCol, blastRow)) { return; }
+
 	// The current tile will be processed after all the other destruction
 	if (col == blastCol && row == blastRow) { return; }
 
