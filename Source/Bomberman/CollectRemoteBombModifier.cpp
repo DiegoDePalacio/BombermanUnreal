@@ -24,8 +24,8 @@ void CollectRemoteBombModifier::Process()
 
 	board->UnregisterTimer(timer);
 
-	// Destroy this modifier after his time is over
-	board->SetModifier(nullptr, col, row);
+	// Commit suicide, because there are no link on the board to this modifier
+	delete(this);
 }
 
 void CollectRemoteBombModifier::OnPlayerContact(ABombermanPlayer * playerToApply)
@@ -42,5 +42,8 @@ void CollectRemoteBombModifier::OnPlayerContact(ABombermanPlayer * playerToApply
 		board->RegisterTimer(timer);
 
 		visual->SetActorHiddenInGame(true);
+
+		// Unlink the modifier of the board without destroying it, we need to care of our own destruction
+		board->ReleaseModifier(col, row);
 	}
 }

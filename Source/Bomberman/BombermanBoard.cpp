@@ -248,6 +248,34 @@ void ABombermanBoard::SetDeadPlayer(ABombermanPlayer * player)
 	deadPlayers.Add(player);
 }
 
+void ABombermanBoard::ReleaseModifier(int col, int row)
+{
+	// Check first if it's outside of the board
+	if (!IsInBoard(col, row)) { return; }
+
+	// Check if is in a tile with a indestructible wall
+	if (IsUndestructibleWall(col, row)) { return; }
+
+	if (tiles.Num() <= col) { return; }
+
+	// If is an even column, check directly on the row number of the FBoardModifierCol instance
+	if (col % 2 == 0)
+	{
+		if (modifierCols[col]->modifiers.Num() <= row) { return; }
+
+		modifierCols[col]->modifiers[row] = nullptr;
+	}
+	else
+	{
+		// If not, first calculate the respective index
+		int rowIndex = FGenericPlatformMath::RoundToInt(row / 2.0f);
+
+		if (modifierCols[col]->modifiers.Num() <= rowIndex) { return; }
+
+		modifierCols[col]->modifiers[rowIndex] = nullptr;
+	}
+}
+
 bool ABombermanBoard::IsTheGameOver()
 {
 	return deadPlayers.Num() > 0;

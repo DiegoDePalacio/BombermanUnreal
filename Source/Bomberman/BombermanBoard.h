@@ -144,4 +144,7 @@ public:
 	bool IsPlayableTile(int col, int row);
 
 	void SetDeadPlayer(ABombermanPlayer* player);
+
+	// Just unlink the modifier from the tile in order to not destroy it, but leave the tile empty for other use
+	void ReleaseModifier(int col, int row);
 };
