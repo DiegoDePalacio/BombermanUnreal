@@ -13,7 +13,11 @@ BlastModifier::BlastModifier(ABombermanBoard* newBombermanBoard, int newCol, int
 
 BlastModifier::~BlastModifier()
 {
-	delete(timer);
+	if (timer != nullptr)
+	{
+		board->UnregisterTimer(timer);
+		delete(timer);
+	}
 }
 
 void BlastModifier::Process()

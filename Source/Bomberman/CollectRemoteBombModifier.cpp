@@ -10,7 +10,11 @@ CollectRemoteBombModifier::CollectRemoteBombModifier(ABombermanBoard* newBomberm
 
 CollectRemoteBombModifier::~CollectRemoteBombModifier()
 {
-	delete(timer);
+	if (timer != nullptr)
+	{
+		board->UnregisterTimer(timer);
+		delete(timer);
+	}
 }
 
 void CollectRemoteBombModifier::Process()

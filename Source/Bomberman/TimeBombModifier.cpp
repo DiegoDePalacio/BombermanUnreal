@@ -13,7 +13,11 @@ TimeBombModifier::TimeBombModifier (ABombermanBoard* newBombermanBoard, int newC
 
 TimeBombModifier::~TimeBombModifier()
 {
-	delete(timer);
+	if( timer != nullptr )
+	{
+		board->UnregisterTimer(timer);
+		delete(timer);
+	}
 }
 
 void TimeBombModifier::Process()
