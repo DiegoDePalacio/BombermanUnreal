@@ -33,7 +33,7 @@ public:
 	const int MAX_BLAST_EXTENSION = 5;
 
 	// Power-ups amounts to be granted to the player collecting them
-	const float POWER_UP_SPEED = 0.5f;
+	const float POWER_UP_SPEED = 0.35f;
 	const int POWER_UP_BOMB_CAPACITY = 1;
 	const int POWER_UP_BOMB_BLAST = 1;
 	const float POWER_UP_REMOTE_BOMB = 10.0f;

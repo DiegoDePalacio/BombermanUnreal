@@ -35,8 +35,8 @@ class BOMBERMAN_API Modifier
 {
 public:
 	// TODO: Expose this constant to be configurable through the editor
-	const float TIME_BOMB_IN_SECS = 5.0f;
-	const float BLAST_DURATION_IN_SECS = 5.0f;
+	const float TIME_BOMB_IN_SECS = 3.0f;
+	const float BLAST_DURATION_IN_SECS = 1.0f;
 
 	// Useful for our RTTI system
 	EModifierType type = EModifierType::UNSET;
