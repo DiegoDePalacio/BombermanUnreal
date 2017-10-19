@@ -56,6 +56,9 @@ float ABombermanPlayer::MoveHorizontally(float amount)
 	// If no movement there is nothing to do
 	if( amount == 0.0f ) { return 0.0f; }
 
+	// Multiply by the player speed
+	amount *= speed;
+
 	// Check first the board boundaries
 	if (!WillStayInsideTheBoard(true,amount)) { return 0.0f; }
 
@@ -95,6 +98,9 @@ float ABombermanPlayer::MoveVertically(float amount)
 {
 	// If no movement there is nothing to do
 	if (amount == 0.0f) { return 0.0f; }
+
+	// Multiply by the player speed
+	amount *= speed;
 
 	// Check first the board boundaries
 	if (!WillStayInsideTheBoard(false, amount)) { return 0.0f; }
