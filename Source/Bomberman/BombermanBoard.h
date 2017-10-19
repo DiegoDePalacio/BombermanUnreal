@@ -127,4 +127,7 @@ public:
 
 	// Destroy a wall and return a power-up if is created behind the wall
 	Modifier* DestroyWall(int col, int row);
+
+	// Is inside the board and not a indestructible wall?
+	bool IsPlayableTile(int col, int row);
 };
