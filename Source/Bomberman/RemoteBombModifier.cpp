@@ -89,8 +89,8 @@ void RemoteBombModifier::CheckForBlastOnTile(int blastCol, int blastRow)
 // Kill and destroy all the power-ups and destructible walls on the tile to be the place of the blast
 void RemoteBombModifier::DestroyAndBlastOnTile(int blastCol, int blastRow)
 {
-	// Destroy the destructible wall if any
-	if (!board->DestroyWall(blastCol, blastRow))
+	// Destroy the destructible wall if any and set a blast if there was no power-up behind
+	if (board->DestroyWall(blastCol, blastRow) == nullptr)
 	{
 		// If not, kill all the players that are on this BLAST tile if any
 		TArray<ABombermanPlayer*> playersOnBlast = board->GetPlayersInTile(blastCol, blastRow);
