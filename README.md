@@ -3,6 +3,13 @@
 # October, 2107
 
 
+HOW TO PLAY
+
+Blue Player: WASD keys for navigation and Ctrl left for action;
+Orange Player: Arrow key for navigation and Ctrl right for action;
+Backspace to restart the game.
+
+
 INTRODUCTION
 
 The game required from my side more time than expected, because the last time that I worked with Unreal was 6 years ago and it was Unreal Engine 3 without blueprints and with UnrealScript instead.
