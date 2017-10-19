@@ -10,19 +10,30 @@ CollectRemoteBombModifier::CollectRemoteBombModifier(ABombermanBoard* newBomberm
 
 CollectRemoteBombModifier::~CollectRemoteBombModifier()
 {
+	delete(timer);
 }
 
 void CollectRemoteBombModifier::Process()
 {
 	// Remove the remote from the player
 	player->RemoveRemoteBomb();
+
+	board->UnregisterTimer(timer);
+
+	// Destroy this modifier after his time is over
+	board->SetModifier(nullptr, col, row);
 }
 
 void CollectRemoteBombModifier::OnPlayerContact(ABombermanPlayer * playerToApply)
 {
 	if (playerToApply != nullptr)
 	{
-		playerToApply->AddRemoteBomb();
+		player = playerToApply;
+		player->AddRemoteBomb();
+		
 		timer = new TriggerModifierOnProcessTimer(this, remoteDuration);
+		board->RegisterTimer(timer);
+
+		visual->SetActorHiddenInGame(true);
 	}
 }
