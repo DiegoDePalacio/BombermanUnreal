@@ -56,6 +56,9 @@ float ABombermanPlayer::MoveHorizontally(float amount)
 	// If no movement there is nothing to do
 	if( amount == 0.0f ) { return 0.0f; }
 
+	// The game is freeze after being over
+	if( bombermanBoard->IsTheGameOver() ) { return 0.0f; }
+
 	// Multiply by the player speed
 	amount *= speed;
 
@@ -99,6 +102,9 @@ float ABombermanPlayer::MoveVertically(float amount)
 	// If no movement there is nothing to do
 	if (amount == 0.0f) { return 0.0f; }
 
+	// The game is freeze after being over
+	if (bombermanBoard->IsTheGameOver()) { return 0.0f; }
+
 	// Multiply by the player speed
 	amount *= speed;
 
@@ -137,6 +143,9 @@ float ABombermanPlayer::MoveVertically(float amount)
 
 void ABombermanPlayer::ActionButtonPressed()
 {
+	// The game is freeze after being over
+	if (bombermanBoard->IsTheGameOver()) { return; }
+
 	// If the player has the control of a remote bomb, then explode it
 	if (remoteBomb != nullptr)
 	{
@@ -203,6 +212,7 @@ bool ABombermanPlayer::IsInTile(int colToCheck, int rowToCheck)
 
 void ABombermanPlayer::DieOnNextFrame()
 {
+	bombermanBoard->SetDeadPlayer(this);
 }
 
 void ABombermanPlayer::AddToSpeed(float amount)

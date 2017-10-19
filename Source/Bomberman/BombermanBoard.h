@@ -90,6 +90,13 @@ public:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 	float normalizedProbabilityOfPowerUpInDestructibleWall = 0.3f;
 
+	// If there is no tie, this variable will contain the winner
+	UPROPERTY(BlueprintReadOnly)
+	ABombermanPlayer* winner;
+
+	UFUNCTION(BlueprintCallable)
+	bool IsTheGameOver();
+
 private:
 	ABombermanGameModeBase* gameSettings = nullptr;
 
@@ -97,12 +104,17 @@ private:
 	TArray<TriggerModifierOnProcessTimer*> timers;
 	TArray<FBoardModifierCol*> modifierCols;
 	TArray<ABombermanPlayer*> players;
+	TArray<ABombermanPlayer*> deadPlayers;
 
 	// TODO: Make this available and configurable in the editor in order to be able to choose which 
 	// power-ups will appear on a current level
 
 	// The number of power ups implemented on the game
 	const int AVAILABLE_POWER_UPS = 4;
+
+	// For optimization reasons, this variable will be true if the game is over and the winner was assigned if was not a tie
+	// In case of tie, the winner will be null, but this variable assures that this fact doesn't needs to be checked
+	bool wasTheGameDecided = false;
 
 private:
 	void GenerateBoard();
@@ -130,4 +142,6 @@ public:
 
 	// Is inside the board and not a indestructible wall?
 	bool IsPlayableTile(int col, int row);
+
+	void SetDeadPlayer(ABombermanPlayer* player);
 };

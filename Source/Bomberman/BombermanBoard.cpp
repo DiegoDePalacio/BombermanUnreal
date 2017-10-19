@@ -67,6 +67,26 @@ void ABombermanBoard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsTheGameOver()) 
+	{
+		if (!wasTheGameDecided)
+		{
+			// If there is only one survivor
+			if( players.Num() == deadPlayers.Num() + 1 )
+			{
+				for (int i = 0; i < deadPlayers.Num(); ++i)
+				{
+					players.Remove(deadPlayers[i]);
+				}
+				winner = players[0];
+			}
+			wasTheGameDecided = true;
+		}
+
+		// Stop updating the game is it's already over
+		return; 
+	}
+
 	for (int i = timers.Num() - 1; i >= 0; --i)
 	{
 		timers[i]->Update(DeltaTime);
@@ -221,6 +241,16 @@ void ABombermanBoard::SetTileAsEmpty(int col, int row)
 
 		tiles[col]->destructibleWalls[rowIndex] = nullptr;
 	}
+}
+
+void ABombermanBoard::SetDeadPlayer(ABombermanPlayer * player)
+{
+	deadPlayers.Add(player);
+}
+
+bool ABombermanBoard::IsTheGameOver()
+{
+	return deadPlayers.Num() > 0;
 }
 
 ABombermanDestructibleWall* ABombermanBoard::GetTile(int col, int row)
