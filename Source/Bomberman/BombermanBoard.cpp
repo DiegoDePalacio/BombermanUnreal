@@ -169,10 +169,8 @@ bool ABombermanBoard::IsInBoard(int col, int row)
 }
 
 // Create the visual model for the modifier on the provided position
-void ABombermanBoard::SpawnModifierVisual(int col, int row)
+void ABombermanBoard::SpawnModifierVisual(Modifier* modifier, int col, int row)
 {
-	Modifier* modifier = GetModifier(col, row);
-
 	// If there is no associated modifier, then there is nothing to spawn
 	if (modifier == nullptr) { return; }
 
@@ -331,7 +329,7 @@ bool ABombermanBoard::SetModifier(Modifier* newModifier, int col, int row)
 		}
 
 		modifierCols[col]->modifiers[row] = newModifier;
-		SpawnModifierVisual(col, row);
+		SpawnModifierVisual(newModifier, col, row);
 	}
 	else
 	{
@@ -353,7 +351,7 @@ bool ABombermanBoard::SetModifier(Modifier* newModifier, int col, int row)
 		}
 
 		modifierCols[col]->modifiers[rowIndex] = newModifier;
-		SpawnModifierVisual(col, rowIndex);
+		SpawnModifierVisual(newModifier, col, row);
 	}
 
 	return true;
@@ -412,7 +410,7 @@ bool ABombermanBoard::DestroyWall(int col, int row)
 		int rowIndex = ( col % 2 == 0 ? row : FGenericPlatformMath::RoundToInt(row / 2.0f) );
 
 		modifierCols[col]->modifiers[rowIndex] = modifier;
-		SpawnModifierVisual(col, rowIndex);
+		SpawnModifierVisual(modifier, col, row);
 	}
 
 	return true;
