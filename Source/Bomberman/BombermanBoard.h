@@ -125,5 +125,6 @@ public:
 
 	TArray<ABombermanPlayer*> GetPlayersInTile(int col, int row);
 
-	bool DestroyWall(int col, int row);
+	// Destroy a wall and return a power-up if is created behind the wall
+	Modifier* DestroyWall(int col, int row);
 };
