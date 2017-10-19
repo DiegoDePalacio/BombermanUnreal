@@ -30,6 +30,9 @@ void CollectRemoteBombModifier::Process()
 
 void CollectRemoteBombModifier::OnPlayerContact(ABombermanPlayer * playerToApply)
 {
+	// If the modifier was already assigned, then there is nothing to do
+	if (player != nullptr) { return; }
+
 	if (playerToApply != nullptr)
 	{
 		player = playerToApply;
